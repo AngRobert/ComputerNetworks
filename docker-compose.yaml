@@ -1,11 +1,11 @@
 services:
     server:
         build:
-            context: ./server
+            context: ./tcp_hijacking/server/
         privileged: true
         volumes:
-            - .:/local
-            - ./policies.json:/usr/lib/firefox/distribution/policies.json
+            - ./tcp_hijacking:/local
+            - ./tcp_hijacking/policies.json:/usr/lib/firefox/distribution/policies.json
         tty: true
         cap_add:
           - NET_ADMIN
@@ -24,9 +24,9 @@ services:
         command: /bin/sh -c "/local/sh/server.sh && /init"
     middle:
         build:
-            context: .
+            context: ./tcp_hijacking/
         volumes:
-            - .:/local
+            - ./tcp_hijacking:/local
         tty: true
         cap_add:
           - NET_ADMIN
@@ -43,9 +43,9 @@ services:
         command: bash -c "/local/sh/middle.sh && python3 local/poison.py"
     router:
         build:
-            context: .
+            context: ./tcp_hijacking/
         volumes:
-            - .:/local
+            - ./tcp_hijacking:/local
         tty: true
         cap_add:
           - NET_ADMIN
@@ -62,9 +62,9 @@ services:
         command: bash -c "/local/sh/router.sh && sleep infinity"
     client:
         build:
-            context: .
+            context: ./tcp_hijacking/
         volumes:
-            - .:/local
+            - ./tcp_hijacking:/local
         tty: true
         cap_add:
           - NET_ADMIN
@@ -79,7 +79,14 @@ services:
         sysctls:
           - net.ipv4.tcp_congestion_control=reno
         command: bash -c "/local/sh/client.sh && sleep infinity"
-
+    dashboard:
+      build: 
+        context: "./home_website/"
+      ports:
+        - "3000:3000"
+      networks:
+        subnet1:
+          ipv4_address: 172.10.0.10
 networks:
     subnet1:
         driver_opts:
