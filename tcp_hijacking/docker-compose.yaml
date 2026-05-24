@@ -5,6 +5,7 @@ services:
         privileged: true
         volumes:
             - .:/local
+            - ./policies.json:/usr/lib/firefox/distribution/policies.json
         tty: true
         cap_add:
           - NET_ADMIN
@@ -82,7 +83,7 @@ services:
 networks:
     subnet1:
         driver_opts:
-          com.docker.network.driver.mtu: 1400
+          com.docker.network.driver.mtu: 1500
         ipam:
           driver: default
           config:
@@ -90,7 +91,7 @@ networks:
                 gateway: 172.10.1.1
     subnet2:
         driver_opts:
-          com.docker.network.driver.mtu: 1400
+          com.docker.network.driver.mtu: 1500
         ipam:
           driver: default
           config:

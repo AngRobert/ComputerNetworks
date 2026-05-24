@@ -1,0 +1,14 @@
+{
+  "policies": {
+    "WebsiteFilter": {
+      "Block": ["<all_urls>"],
+      "Exceptions": [
+        "*://*.80.96.21.96/*",
+        "*://80.96.21.96/*",
+        "*://haveibeenpwned.com/*"
+      ]
+    },
+    "DisableAppUpdate": true,
+    "DisableTelemetry": true
+  }
+}
