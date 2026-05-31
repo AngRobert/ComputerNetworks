@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MXMap România</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!--< link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">-->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --col-local:   #4ade80;
+    --col-hybrid:  #facc15;
+    --col-foreign: #f87171;
+    --col-unknown: #94a3b8;
+    --col-nodata:  #1e293b;
+    --bg: #0a0f1e;
+    --panel: #111827;
+    --border: #1f2d45;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    z-index: 1000;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span { color: #60a5fa; }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    font-size: 0.75rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.2s;
+  }
+
+  .legend-item.dimmed { opacity: 0.35; }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  #map {
+    flex: 1;
+    width: 100%;
+  }
+
+  .info-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    z-index: 1000;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    min-width: 260px;
+    max-width: 320px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .info-panel.hidden { opacity: 0; }
+
+  .info-panel h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+  }
+
+  .info-row .label { color: var(--muted); flex-shrink: 0; }
+  .info-row .value { text-align: right; word-break: break-all; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-local   { background: #14532d; color: var(--col-local); }
+  .badge-hybrid  { background: #713f12; color: var(--col-hybrid); }
+  .badge-foreign { background: #7f1d1d; color: var(--col-foreign); }
+  .badge-unknown { background: #1e293b; color: var(--col-unknown); }
+  .badge-no_data { background: #0f172a; color: var(--muted); }
+
+  .stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .stats strong { color: var(--text); font-size: 0.9rem; }
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    transition: opacity 0.4s;
+  }
+
+  .leaflet-container { background: var(--bg) !important; }
+  .leaflet-tile-pane { filter: brightness(0.4) saturate(0.3); }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="spinner"></div>
+  <span id="loader-text">Se încarcă harta…</span>
+</div>
+
+<header>
+  <h1>MXMap <span>Romania</span></h1>
+  <div class="legend" id="legend">
+    <div class="legend-item" data-cls="local"   onclick="toggleFilter('local')">
+      <div class="legend-dot" style="background:var(--col-local)"></div> Local
+    </div>
+    <div class="legend-item" data-cls="hybrid"  onclick="toggleFilter('hybrid')">
+      <div class="legend-dot" style="background:var(--col-hybrid)"></div> Hybrid
+    </div>
+    <div class="legend-item" data-cls="foreign" onclick="toggleFilter('foreign')">
+      <div class="legend-dot" style="background:var(--col-foreign)"></div> Foreign
+    </div>
+    <div class="legend-item" data-cls="unknown" onclick="toggleFilter('unknown')">
+      <div class="legend-dot" style="background:var(--col-unknown)"></div> Unknown
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div id="map"></div>
+
+<div class="info-panel hidden" id="info">
+  <h2 id="info-name">—</h2>
+  <div class="info-row"><span class="label">Classification</span><span class="value" id="info-cls">—</span></div>
+  <div class="info-row"><span class="label">MX server</span><span class="value" id="info-mx">—</span></div>
+  <div class="info-row"><span class="label">Provider</span><span class="value" id="info-provider">—</span></div>
+  <div class="info-row"><span class="label">Server Country</span><span class="value" id="info-country">—</span></div>
+  <div class="info-row" id="info-spf-row"><span class="label">SPF foreign</span><span class="value" id="info-spf">—</span></div>
+</div>
+
+<script>
+const COLORS = {
+  local:   '#4ade80',
+  hybrid:  '#facc15',
+  foreign: '#f87171',
+  unknown: '#94a3b8',
+  no_data: '#1e2940',
+};
+
+const FILL_OPACITY = {
+  local: 0.75, hybrid: 0.8, foreign: 0.75, unknown: 0.5, no_data: 0.3
+};
+
+// which classes are currently visible
+const visible = { local: true, hybrid: true, foreign: true, unknown: true };
+
+const map = L.map('map', {
+  center: [45.9, 24.9],
+  zoom: 7,
+  zoomControl: true,
+  preferCanvas: true,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 18,
+}).addTo(map);
+
+let geojsonLayer;
+let allFeatures = [];
+
+function styleFeature(feature) {
+  const cls = feature.properties.classification || 'no_data';
+  const show = cls === 'no_data' || visible[cls] !== false;
+  return {
+    fillColor: COLORS[cls] || COLORS.no_data,
+    fillOpacity: show ? (FILL_OPACITY[cls] || 0.6) : 0,
+    color: '#0a0f1e',
+    weight: 0.4,
+    opacity: show ? 0.6 : 0,
+  };
+}
+
+function updateStyles() {
+  if (geojsonLayer) geojsonLayer.setStyle(styleFeature);
+}
+
+function toggleFilter(cls) {
+  visible[cls] = !visible[cls];
+  document.querySelector(`.legend-item[data-cls="${cls}"]`)
+    .classList.toggle('dimmed', !visible[cls]);
+  updateStyles();
+}
+
+const info = document.getElementById('info');
+
+function showInfo(props) {
+  const cls = props.classification || 'no_data';
+  document.getElementById('info-name').textContent =
+    props.name + (props.county ? `, ${props.county}` : '');
+
+  const badgeEl = document.getElementById('info-cls');
+  badgeEl.innerHTML = `<span class="badge badge-${cls}">${cls}</span>`;
+
+  document.getElementById('info-mx').textContent      = props.mx || '—';
+  document.getElementById('info-provider').textContent = props.provider || '—';
+  document.getElementById('info-country').textContent  = props.mail_country || '—';
+
+  const spfRow = document.getElementById('info-spf-row');
+  const spfVal = props.spf_foreign || '';
+  if (spfVal && spfVal !== 'nan' && spfVal !== '[]') {
+    document.getElementById('info-spf').textContent = spfVal;
+    spfRow.style.display = 'flex';
+  } else {
+    spfRow.style.display = 'none';
+  }
+
+  info.classList.remove('hidden');
+}
+
+function hideInfo() {
+  info.classList.add('hidden');
+}
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    mouseover(e) {
+      e.target.setStyle({ weight: 1.5, color: '#fff', fillOpacity: 0.95 });
+      showInfo(feature.properties);
+    },
+    mouseout(e) {
+      geojsonLayer.resetStyle(e.target);
+      hideInfo();
+    },
+    click(e) {
+      map.fitBounds(e.target.getBounds(), { padding: [40, 40] });
+    }
+  });
+}
+
+function buildStats(features) {
+  const counts = { local: 0, hybrid: 0, foreign: 0, unknown: 0, no_data: 0 };
+  features.forEach(f => {
+    const c = f.properties.classification || 'no_data';
+    counts[c] = (counts[c] || 0) + 1;
+  });
+  const total = features.length;
+  const statsEl = document.getElementById('stats');
+  statsEl.innerHTML = `
+    <span><strong>${counts.local}</strong> local</span>
+    <span><strong>${counts.hybrid}</strong> hibrid</span>
+    <span><strong>${counts.foreign}</strong> foreign</span>
+    <span><strong>${counts.unknown}</strong> necunoscut</span>
+    <span><strong>${counts.no_data}</strong> fără date</span>
+    <span>/ ${total} total</span>
+  `;
+}
+
+// Load GeoJSON
+document.getElementById('loader-text').textContent = 'Loading GeoJSON data...';
+
+fetch('ro_mail_map.geojson')
+  .then(r => {
+    if (!r.ok) throw new Error('Couldnt load GeoJSON file!');
+    document.getElementById('loader-text').textContent = 'Loading...';
+    return r.json();
+  })
+  .then(data => {
+    allFeatures = data.features;
+    geojsonLayer = L.geoJSON(data, {
+      style: styleFeature,
+      onEachFeature,
+    }).addTo(map);
+
+    buildStats(allFeatures);
+
+    const loader = document.getElementById('loader');
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  })
+  .catch(err => {
+    document.getElementById('loader-text').textContent = '⚠ ' + err.message;
+  });
+</script>
+</body>
+</html>
