@@ -328,28 +328,20 @@ function buildStats(features) {
 // Load GeoJSON
 document.getElementById('loader-text').textContent = 'Loading GeoJSON data...';
 
-fetch('ro_mail_map.geojson')
-  .then(r => {
-    if (!r.ok) throw new Error('Couldnt load GeoJSON file!');
-    document.getElementById('loader-text').textContent = 'Loading...';
-    return r.json();
-  })
-  .then(data => {
-    allFeatures = data.features;
-    geojsonLayer = L.geoJSON(data, {
-      style: styleFeature,
-      onEachFeature,
-    }).addTo(map);
+const data = {{ geojson_content|safe }}
+console.log(data)
+allFeatures = data.features;
+geojsonLayer = L.geoJSON(data, {
+  style: styleFeature,
+  onEachFeature,
+}).addTo(map);
 
-    buildStats(allFeatures);
+buildStats(allFeatures);
 
-    const loader = document.getElementById('loader');
-    loader.classList.add('hidden');
-    setTimeout(() => loader.remove(), 500);
-  })
-  .catch(err => {
-    document.getElementById('loader-text').textContent = '⚠ ' + err.message;
-  });
+const loader = document.getElementById('loader');
+loader.classList.add('hidden');
+setTimeout(() => loader.remove(), 500);
+
 </script>
 </body>
 </html>

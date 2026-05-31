@@ -87,6 +87,15 @@ services:
       networks:
         subnet1:
           ipv4_address: 172.10.0.10
+
+    mxmap:
+      build: 
+        context: "./mxmap/"
+      ports:
+        - "5000:5000"
+      networks:
+        subnet1:
+          ipv4_address: 172.10.0.20
 networks:
     subnet1:
         driver_opts:
