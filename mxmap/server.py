@@ -1,10 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 
 app = Flask(__name__)
 
 @app.route("/")
 def mxmap():
-    with open("ro_mail_map.geojson") as f:
-        content = f.read()
+    return render_template("index.html")
 
-    return render_template("index.html", geojson_content=content)
+@app.route("/data.geojson")
+def get_geojson():
+    return send_file("ro_mail_map.geojson", mimetype="application/json")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

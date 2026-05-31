@@ -326,21 +326,33 @@ function buildStats(features) {
 }
 
 // Load GeoJSON
-document.getElementById('loader-text').textContent = 'Loading GeoJSON data...';
+document.getElementById('loader-text').textContent = 'Se descarcă datele hărții...';
 
-const data = {{ geojson_content|safe }}
-console.log(data)
-allFeatures = data.features;
-geojsonLayer = L.geoJSON(data, {
-  style: styleFeature,
-  onEachFeature,
-}).addTo(map);
+fetch('/data.geojson')
+  .then(response => {
+    if (!response.ok) {
+        throw new Error('Nu s-a putut încărca fișierul GeoJSON!');
+    }
+    return response.json();
+  })
+  .then(data => {
+    allFeatures = data.features;
+    
+    geojsonLayer = L.geoJSON(data, {
+      style: styleFeature,
+      onEachFeature: onEachFeature,
+    }).addTo(map);
 
-buildStats(allFeatures);
+    buildStats(allFeatures);
 
-const loader = document.getElementById('loader');
-loader.classList.add('hidden');
-setTimeout(() => loader.remove(), 500);
+    const loader = document.getElementById('loader');
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  })
+  .catch(err => {
+    document.getElementById('loader-text').textContent = '⚠ ' + err.message;
+    console.error(err);
+  });
 
 </script>
 </body>
