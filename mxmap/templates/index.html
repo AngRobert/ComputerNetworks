@@ -266,7 +266,7 @@ const info = document.getElementById('info');
 function showInfo(props) {
   const cls = props.classification || 'no_data';
   document.getElementById('info-name').textContent =
-    props.name + (props.county ? `, ${props.county}` : '');
+    props.name.toUpperCase() + (props.county ? `, ${props.county.toUpperCase()}` : '');
 
   const badgeEl = document.getElementById('info-cls');
   badgeEl.innerHTML = `<span class="badge badge-${cls}">${cls}</span>`;
