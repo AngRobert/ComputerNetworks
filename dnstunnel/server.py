@@ -3,7 +3,6 @@ from math import ceil
 from dnslib import DNSRecord, DNSHeader, DNSQuestion, RR, TXT, QTYPE, RCODE
 
 
-
 # udp is always on port 53
 PORT = 53
 # 0.0.0.0 accepts all ip's associated with the server
