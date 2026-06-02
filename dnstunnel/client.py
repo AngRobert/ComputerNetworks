@@ -40,7 +40,7 @@ val = response.rr[0].rdata.data[0].decode()
 
 nr_buc = int(val.split(':')[1])
 initial_checksum = val.split(':')[2]
-print(nr_buc)
+print(f'total number of chunks: {nr_buc}')
 
 # start is the first chunk the server will read and send to
 start = 0
@@ -58,7 +58,7 @@ if os.path.exists(f'downloads/{filename}'):
             temp.truncate(already_written_bucati * BUCSIZE)
 
     if already_written_bucati > 0:
-        print(f"File was already partially written! Continuing from where chunk {already_written_bucati}...")
+        print(f"File was already partially written! Continuing from chunk {already_written_bucati - 1}...")
         start = already_written_bucati
 
 
@@ -69,7 +69,7 @@ f = open(f'downloads/{filename}', 'ab')
 for i in range(start, nr_buc):
     query = DNSRecord(q=DNSQuestion(f'buc{i}.{filename}.tunnel.andrei12225.engineer', QTYPE.TXT)).pack()
     s.settimeout(3)
-    print(i)
+    print(f'Getting bucata {i}...')
 
     # we try 3 times to receive the packets
     for j in range(3):
