@@ -1,7 +1,8 @@
 import hashlib
 import socket
-from time import sleep
+import os
 import base64
+from time import sleep
 from dnslib import DNSRecord, DNSHeader, DNSQuestion, RR, TXT, QTYPE, RCODE
 
 filename = input("Input the name of the file you want to request (including extension): ")
@@ -11,6 +12,7 @@ filename = input("Input the name of the file you want to request (including exte
 SERVER = '144.126.226.144'
 PORT = 53
 META_DOMAIN = f'meta.{filename}.tunnel.andrei12225.engineer'
+BUCSIZE = 180
 
 # we will use this to check against the md5 checksum we will get when we ask for metadata
 def get_md5(filename):
@@ -40,10 +42,31 @@ nr_buc = int(val.split(':')[1])
 initial_checksum = val.split(':')[2]
 print(nr_buc)
 
-# f is open in wb because we will write in binary because of the encoding and decoding
-f = open(f'downloads/{filename}', 'wb')
+# start is the first chunk the server will read and send to
+start = 0
 
-for i in range(nr_buc):
+# theoretically, if the downloads directory wouldn't exist it would crash so i added this here
+os.makedirs('downloads', exist_ok=True)
+
+if os.path.exists(f'downloads/{filename}'):
+    size = os.path.getsize(f'downloads/{filename}')
+    already_written_bucati = size // BUCSIZE
+
+    # if the last chunk was partially written, we have to clean it up and start fresh
+    if size % BUCSIZE != 0:
+        with open(f'downloads/{filename}', 'a+b') as temp:
+            temp.truncate(already_written_bucati * BUCSIZE)
+
+    if already_written_bucati > 0:
+        print(f"File was already partially written! Continuing from where chunk {already_written_bucati}...")
+        start = already_written_bucati
+
+
+# f is open in ab because we will write in binary because of the encoding and decoding
+f = open(f'downloads/{filename}', 'ab')
+
+
+for i in range(start, nr_buc):
     query = DNSRecord(q=DNSQuestion(f'buc{i}.{filename}.tunnel.andrei12225.engineer', QTYPE.TXT)).pack()
     s.settimeout(3)
     print(i)
@@ -82,11 +105,15 @@ for i in range(nr_buc):
 
     f.write(val)
 
+f.close()    
+
+# close the file before the calculating the checksum, so that it gives the correct output
 final_checksum = get_md5(f'downloads/{filename}')
+
+print(initial_checksum)
+print(final_checksum)
 
 if initial_checksum == final_checksum:
     print("The file was transfered successfully!")
 else:
     print("The file was corrupted during transfer!")
-
-f.close()    
