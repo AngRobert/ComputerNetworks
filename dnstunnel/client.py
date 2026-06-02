@@ -1,3 +1,4 @@
+import hashlib
 import socket
 from time import sleep
 import base64
@@ -10,6 +11,15 @@ filename = input("Input the name of the file you want to request (including exte
 SERVER = '144.126.226.144'
 PORT = 53
 META_DOMAIN = f'meta.{filename}.tunnel.andrei12225.engineer'
+
+# we will use this to check against the md5 checksum we will get when we ask for metadata
+def get_md5(filename):
+    hash = hashlib.md5()
+    with open(filename, 'rb') as f:
+        # read the file in bucati of 8192 so we dont run out of memory in the case of massive files
+        while buc := f.read(8192):
+            hash.update(buc)
+    return hash.hexdigest()
 
 
 # first, build the meta query
@@ -27,6 +37,7 @@ response = DNSRecord.parse(data)
 val = response.rr[0].rdata.data[0].decode()
 
 nr_buc = int(val.split(':')[1])
+initial_checksum = val.split(':')[2]
 print(nr_buc)
 
 # f is open in wb because we will write in binary because of the encoding and decoding
@@ -70,5 +81,12 @@ for i in range(nr_buc):
     val = base64.b64decode(val)
 
     f.write(val)
+
+final_checksum = get_md5(f'downloads/{filename}')
+
+if initial_checksum == final_checksum:
+    print("The file was transfered successfully!")
+else:
+    print("The file was corrupted during transfer!")
 
 f.close()    

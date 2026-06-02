@@ -1,3 +1,4 @@
+import hashlib
 import socket, os, base64
 from math import ceil
 from dnslib import DNSRecord, DNSHeader, DNSQuestion, RR, TXT, QTYPE, RCODE
@@ -12,6 +13,15 @@ SERVER = '0.0.0.0'
 # larger size by about 30% ==> a maximum size of 180 bytes + 30% = 240, which is < 255
 BUCSIZE = 180
 DOMAIN = 'tunnel.andrei12225.engineer'
+
+
+def getMD5(filename):
+    hash = hashlib.md5()
+    with open(f'files/{filename}', 'rb') as f:
+        # read the file in bucati of 8192 so we dont run out of memory in the case of massive files
+        while buc := f.read(8192):
+            hash.update(buc)
+    return hash.hexdigest()
 
 
 # handles delivering the specific chunk of the file to the client
@@ -32,7 +42,7 @@ def handleBucataCommand(filename, nr_buc):
 def handleMetaCommand(filename):
     if os.path.exists(f'files/{filename}'):
         size = os.path.getsize(f'files/{filename}')
-        required_bucati = ceil(size / 180)
+        required_bucati = ceil(size / BUCSIZE)
         return required_bucati
     
     return False
@@ -54,7 +64,7 @@ def handleQuery(data, address, s):
     # initialize a reply entity to which we will add answers
     response = request.reply()
 
-    # if it's a txt query from our tonneling domains, extract the subdomains
+    # if it's a txt query from our tunneling domains, extract the subdomains
     if qtype == "TXT" and qname.endswith(DOMAIN):
         
         # get the subdomain from the qname, the -1 is there to keep account of the '.' before the domain name
@@ -72,7 +82,8 @@ def handleQuery(data, address, s):
                 return 
             
             nr_bucati = handleMetaCommand(filename)
-            text = f"chunks:{nr_bucati}"
+            md5_hash = getMD5(filename)
+            text = f"chunks:{nr_bucati}:{md5_hash}"
         else:
             # command[3:] is because "buc" is 3 letters long, so we take everything after it
             nr_buc = int(command[3:])
