@@ -18,7 +18,7 @@ def get_md5(filename):
 
 def start_download(filename):
     # ip of the server, obv
-    SERVER = '144.126.226.144'
+    SERVER = '172.10.0.30'
     PORT = 5002
     META_DOMAIN = f'meta.{filename}.tunnel.andrei12225.engineer'
     BUCSIZE = 180

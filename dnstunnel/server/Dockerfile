@@ -6,4 +6,4 @@ COPY . .
 
 RUN pip install scapy dnslib
 
-CMD ["python", "server.py"]
+CMD ["python", "-u", "server.py"]
