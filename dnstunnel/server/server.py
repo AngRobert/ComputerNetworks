@@ -4,8 +4,7 @@ from math import ceil
 from dnslib import DNSRecord, DNSHeader, DNSQuestion, RR, TXT, QTYPE, RCODE
 
 
-# udp is always on port 53
-PORT = 53
+PORT = 5002
 # 0.0.0.0 accepts all ip's associated with the server
 SERVER = '0.0.0.0'
 # number of bytes of each chunk ("bucata") we will be processing
@@ -17,7 +16,7 @@ DOMAIN = 'tunnel.andrei12225.engineer'
 
 def getMD5(filename):
     hash = hashlib.md5()
-    with open(f'files/{filename}', 'rb') as f:
+    with open(f'/app/files/{filename}', 'rb') as f:
         # read the file in bucati of 8192 so we dont run out of memory in the case of massive files
         while buc := f.read(8192):
             hash.update(buc)
@@ -26,10 +25,10 @@ def getMD5(filename):
 
 # handles delivering the specific chunk of the file to the client
 def handleBucataCommand(filename, nr_buc):
-    if not os.path.exists(f'files/{filename}'):
+    if not os.path.exists(f'/app/files/{filename}'):
         return False
     
-    with open(f'files/{filename}', 'rb') as f:
+    with open(f'/app/files/{filename}', 'rb') as f:
         # go straight to the required chunk
         f.seek(nr_buc * BUCSIZE)
         buc = f.read(BUCSIZE)
@@ -40,8 +39,8 @@ def handleBucataCommand(filename, nr_buc):
 
 # handles a client query about the size of the file requested
 def handleMetaCommand(filename):
-    if os.path.exists(f'files/{filename}'):
-        size = os.path.getsize(f'files/{filename}')
+    if os.path.exists(f'/app/files/{filename}'):
+        size = os.path.getsize(f'/app/files/{filename}')
         required_bucati = ceil(size / BUCSIZE)
         return required_bucati
     

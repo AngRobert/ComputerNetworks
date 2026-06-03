@@ -96,6 +96,31 @@ services:
       networks:
         subnet1:
           ipv4_address: 172.10.0.20
+
+    dnstunnel_server:
+      build: 
+        context: "./dnstunnel/server/"
+      ports:
+        - "5002:5002"
+      volumes:
+        - ./dnstunnel/files:/app/files
+        - ./dnstunnel/downloads:/app/downloads
+      networks:
+        subnet1:
+          ipv4_address: 172.10.0.30
+
+    dnstunnel_flask:
+      build: 
+        context: "./dnstunnel/flask/"
+      ports:
+        - "5001:5001"
+      volumes:
+        - ./dnstunnel/files:/app/files
+        - ./dnstunnel/downloads:/app/downloads
+      networks:
+        subnet1:
+          ipv4_address: 172.10.0.40
+    
 networks:
     subnet1:
         driver_opts:
