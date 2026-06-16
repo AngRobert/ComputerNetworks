@@ -46,14 +46,23 @@ def recursiveResolver(lookup_this):
 
         #print("-----------",dns.ar[2].type, dns.ar[2].rdata) #type e 28 pt ipv6
 
-        i = 0
+        
         if dns.ar == []: # daca nu avem adresele aditionale
+            #ar trebui sa faci un query now cu un server din ns, shimbi tu mai in colo
             return dns
 
-        while dns.ar[i].type != 1 and i <= len(dns.ar) : #poate fi o problema doar daca avem doar adrese ipv6
-            i = i + 1
 
-        root = dns.ar[i].rdata 
+        root1 = 0 
+        for addr in dns.ar:
+            if addr.type == 1: #daca e A record
+                root1 = addr.rdata
+                break
+
+        if root1 != 0:
+            root = root1
+        else
+            #nu a mers, dar macar nu ar mai trebui sa dea crash
+            return dns
 
     return dns
 
