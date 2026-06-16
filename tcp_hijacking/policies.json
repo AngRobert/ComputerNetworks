@@ -5,7 +5,8 @@
       "Exceptions": [
         "*://*.80.96.21.96/*",
         "*://80.96.21.96/*",
-        "*://haveibeenpwned.com/*"
+        "*://haveibeenpwned.com/*",
+	"*://accuweather.com/*"
       ]
     },
     "DisableAppUpdate": true,
