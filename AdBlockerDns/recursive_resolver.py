@@ -60,7 +60,7 @@ def recursiveResolver(lookup_this):
 
         if root1 != 0:
             root = root1
-        else
+        else:
             #nu a mers, dar macar nu ar mai trebui sa dea crash
             return dns
 
