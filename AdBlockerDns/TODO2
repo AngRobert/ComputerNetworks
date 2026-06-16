@@ -1,0 +1,2 @@
+Problema era la CNAME, asta returna, de asta nu aveam nimic in ar, trebuie sa verific si CNAME records, probabil sa implementez si pt NS si TXT si sigur pt AAAA
+foloseste fastAPI: https://github.com/senisioi/computer-networks/blob/2026/capitolul2/src/simple_fastapi.py

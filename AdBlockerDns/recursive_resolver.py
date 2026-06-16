@@ -1,11 +1,22 @@
 from scapy.all import *
+from enum import Enum
 
-def recursiveResolver(lookup_this):
-    #alegem un root server
+class RecordType(Enum):
+    A = 1
+    NS = 2
+    CNAME = 5
+    MX = 15
+    AAAA = 28
+    UNKNOWN = None
+
+
+
+def recursiveResolver(dns_qd, question_type):
+    #alegem un root server, de adaugat o alegere random
     root = '198.41.0.4'
 
-    name = lookup_this.qd.qname.decode('utf-8')
-    lookup_this.show()
+    name = dns_qd.qname
+    print(name, " numele de cautat")
 
     dns = DNS(aa=0, rcode=0, an=[])
 
@@ -14,6 +25,7 @@ def recursiveResolver(lookup_this):
         #deschidem un port udp pt conexiunea cu serverul
         simple_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
         simple_udp.bind(('0.0.0.0', 0)) #lasam os-ul sa decida portul
+
 
         #construim un pachet ca in exemplul in rust
         """classscapy.layers.dns.DNS(_pkt, /, *, length=None, 
@@ -26,7 +38,7 @@ def recursiveResolver(lookup_this):
         qname=b'www.example.com.', qtype=1, unicastresponse=0, qclass=1)[source]
         """
 
-        dns_question = DNSQR(qname=lookup_this.qd.qname)
+        dns_question = DNSQR(qname=name, qtype=question_type)
 
         dns = DNS(id=6767, qr=0, aa=0, rd=0, rcode=0, qdcount=1, qd=dns_question)
         simple_udp.sendto(bytes(dns), (root, 53))
@@ -40,28 +52,35 @@ def recursiveResolver(lookup_this):
         simple_udp.close()
         dns = pack.getlayer(DNS)
 
-        #dns.show()
+        record_type = dns.qd.qtype
+        dns.show()
 
         #an e raspunsul final, ns e nameserver, ar e adresa nameserver-ului
 
         #print("-----------",dns.ar[2].type, dns.ar[2].rdata) #type e 28 pt ipv6
 
         
-        if dns.ar == []: # daca nu avem adresele aditionale
-            #ar trebui sa faci un query now cu un server din ns, shimbi tu mai in colo
+        if dns.ns == []: # daca nu avem adresele aditionale
             return dns
+            #ar trebui sa faci un query now cu un server din ns, shimbi tu mai in colo
+        if dns.ns != [] and dns.ar == []:
+            if question_type == RecordType.CNAME.value:
+                return dns
+            else:
+                query = DNSQR(qname=dns.ns[0].rdata, qtype=RecordType.A.value)
+                root = recursiveResolver(query,RecordType.A.value).an.rdata #luam adresa serverului al carui nume il avem
+             
+        if dns.ar != []:
+            found = 0
+            for record in dns.ar:
+                if record.type == RecordType.A.value:
+                    root = record.rdata
+                    found = 1
 
+        if found == 0:
+            dns.rcode = 1
 
-        root1 = 0 
-        for addr in dns.ar:
-            if addr.type == 1: #daca e A record
-                root1 = addr.rdata
-                break
-
-        if root1 != 0:
-            root = root1
-        else:
-            #nu a mers, dar macar nu ar mai trebui sa dea crash
+        if dns.rcode == 1:
             return dns
 
     return dns
