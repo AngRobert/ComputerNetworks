@@ -10,7 +10,6 @@ class RecordType(Enum):
     UNKNOWN = None
 
 
-
 def recursiveResolver(dns_qd, question_type):
     #alegem un root server, de adaugat o alegere random
     root = '198.41.0.4'
@@ -60,28 +59,38 @@ def recursiveResolver(dns_qd, question_type):
         #print("-----------",dns.ar[2].type, dns.ar[2].rdata) #type e 28 pt ipv6
 
         
-        if dns.ns == []: # daca nu avem adresele aditionale
+        if dns.an != []: # daca nu avem adresele aditionale
             return dns
-            #ar trebui sa faci un query now cu un server din ns, shimbi tu mai in colo
+
         if dns.ns != [] and dns.ar == []:
-            if question_type == RecordType.CNAME.value:
+            #ne trebuie adresa nameserver-ului
+            attrfound = 0
+            for nameserver in dns.ns:
+                if not hasattr(nameserver, "rdata"):
+                    dns.rcode = 1
+                    return dns
+                query = DNSQR(qname=nameserver.rdata, qtype=RecordType.A.value)
+                resp = recursiveResolver(query, RecordType.A.value) #luam adresa serverului al carui nume il avem
+                break
+
+            if resp.rcode == 1:
+                dns.rcode = 1
                 return dns
-            else:
-                query = DNSQR(qname=dns.ns[0].rdata, qtype=RecordType.A.value)
-                root = recursiveResolver(query,RecordType.A.value).an.rdata #luam adresa serverului al carui nume il avem
-             
-        if dns.ar != []:
+            ##daca e soa, e raspuns negativ, daca e ns continui recursia
+        
+            root = resp.an.rdata
+
+        else:
             found = 0
-            for record in dns.ar:
-                if record.type == RecordType.A.value:
-                    root = record.rdata
+            for address in dns.ar:
+                if address.type == RecordType.A.value:
                     found = 1
+                    root = address.rdata
+                    break
 
-        if found == 0:
-            dns.rcode = 1
-
-        if dns.rcode == 1:
-            return dns
-
+            if found == 0:
+                dns.rcode = 1
+                return dns
+             
     return dns
 
