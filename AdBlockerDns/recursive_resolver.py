@@ -9,6 +9,13 @@ class RecordType(Enum):
     AAAA = 28
     UNKNOWN = None
 
+def findRoot():
+            found = 0
+            for address in dns.ar:
+                if address.type == RecordType.A.value:
+                    found = 1
+                    root = address.rdata
+                    break
 
 def recursiveResolver(dns_qd, question_type):
     #alegem un root server, de adaugat o alegere random
@@ -19,12 +26,11 @@ def recursiveResolver(dns_qd, question_type):
 
     dns = DNS(aa=0, rcode=0, an=[])
 
+    #deschidem un port udp pt conexiunea cu serverul
+    simple_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
+    simple_udp.bind(('0.0.0.0', 0)) #lasam os-ul sa decida portul
+
     while(dns.an == [] and dns.rcode == 0): #iese daca avem raspuns sau eroare
-
-        #deschidem un port udp pt conexiunea cu serverul
-        simple_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
-        simple_udp.bind(('0.0.0.0', 0)) #lasam os-ul sa decida portul
-
 
         #construim un pachet ca in exemplul in rust
         """classscapy.layers.dns.DNS(_pkt, /, *, length=None, 
@@ -48,7 +54,6 @@ def recursiveResolver(dns_qd, question_type):
 
         pack = DNS(response)
 
-        simple_udp.close()
         dns = pack.getlayer(DNS)
 
         record_type = dns.qd.qtype
@@ -58,8 +63,13 @@ def recursiveResolver(dns_qd, question_type):
 
         #print("-----------",dns.ar[2].type, dns.ar[2].rdata) #type e 28 pt ipv6
 
-        
-        if dns.an != []: # daca nu avem adresele aditionale
+        if dns.rcode != 0: #eroare
+            simple_udp.close()
+            return dns
+
+        if dns.an != []: # am raspuns si nu am eroare
+            if dn.an.type == RecordType.CNAME.value: #raspunsul e CNAME, nu am terminat inca
+                root = 
             return dns
 
         if dns.ns != [] and dns.ar == []:
@@ -73,24 +83,17 @@ def recursiveResolver(dns_qd, question_type):
                 resp = recursiveResolver(query, RecordType.A.value) #luam adresa serverului al carui nume il avem
                 break
 
-            if resp.rcode == 1:
-                dns.rcode = 1
+            if resp.rcode != 0:
+                dns.rcode = resp.rcode
                 return dns
             ##daca e soa, e raspuns negativ, daca e ns continui recursia
         
             root = resp.an.rdata
 
         else:
-            found = 0
-            for address in dns.ar:
-                if address.type == RecordType.A.value:
-                    found = 1
-                    root = address.rdata
-                    break
 
             if found == 0:
-                dns.rcode = 1
+                dns.rcode = 3
                 return dns
              
     return dns
-

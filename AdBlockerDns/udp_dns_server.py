@@ -2,13 +2,31 @@ from scapy.all import *
 from recursive_resolver import *
 
 def send_response(dns_answer, packet, adresa_sursa):
-    answer_better = dns_answer[0] if isinstance(dns_answer, list) else dns_answer ##nu mergea daca e lista cu mai multe
+
+    if dns_answer.rcode != 0: #eroare
+        response_rcode = dns_answer.rcode
+        answer_better = []
+        aa_real = 0
+
+    else:
+        response_rcode = 0
+        aa_real = 0
+
+        if dns_answer.an == []:
+            answer_better = []
+        else:
+            answer_better = dns_answer.an 
+
+        if packet.qd.type == RecordType.CNAME.value:
+            answer_better = dns_answer.ns
+
+
     dns_response = DNS(
                       id = packet[DNS].id, # DNS replies must have the same ID as requests
                       tc = 0, # fara trunchiere lol
                       qr = 1,              # 1 for response, 0 for query 
-                      aa = 1,              # Authoritative Answer
-                      rcode = 0,           # 0, nicio eroare http://www.networksorcery.com/enp/protocol/dns.htm#Rcode,%20Return%20code
+                      aa = aa_real,              # Authoritative Answer
+                      rcode = response_rcode,           # 0, nicio eroare http://www.networksorcery.com/enp/protocol/dns.htm#Rcode,%20Return%20code
                       qd = packet.qd,      # request-ul original
                       an = answer_better)     # obiectul de reply
 
@@ -98,22 +116,6 @@ while True:
             else:
                 resp = recursiveResolver(dns.qd, dns.qd.qtype)
 
-                if resp.an == []:
-                    if resp.ns != []:
-                        dns_response = DNS(
-                                          id = packet[DNS].id, # DNS replies must have the same ID as requests
-                                          tc = 0, # fara trunchiere lol
-                                          qr = 1,              # 1 for response, 0 for query 
-                                          aa = 1,              # Authoritative Answer
-                                          ns = resp.ns[0],
-                                          rcode = 0,           # 0, nicio eroare http://www.networksorcery.com/enp/protocol/dns.htm#Rcode,%20Return%20code
-                                          qd = packet.qd,      # request-ul original
-                                          an = [])     # obiectul de reply
-                        simple_udp.sendto(bytes(dns_response), adresa_sursa)
-                        continue
-
-                dns_answer = resp.an
-
                 send_response(dns_answer, packet, adresa_sursa) # o sa trimita oricum cod de eroare daca e eroare
 
                 if resp.rcode == 0:
@@ -130,7 +132,7 @@ while True:
                         cache.pop(first_key) #cache-ul e un fifo, nu am zis ca e un chache eficient, dar functioneaza
                         cache[(questionURL, dns.qd.qtype)] = resp.an.rdata
     except Exception as e: # ca sa nu se mai inchida script-ul la erori
-        raise(e)
+        print(e)
 
 simple_udp.close()
 
