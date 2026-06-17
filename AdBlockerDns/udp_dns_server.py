@@ -1,7 +1,7 @@
 from scapy.all import *
 from recursive_resolver import *
 
-def send_response(dns_answer, packet, adresa_sursa):
+def send_response(dns_answer, packet, adresa_sursa, simple_udp):
 
     if dns_answer.rcode != 0: #eroare
         response_rcode = dns_answer.rcode
@@ -33,7 +33,7 @@ def send_response(dns_answer, packet, adresa_sursa):
     print('response:')
     print (dns_response.summary())
 
-    simple_udp.sendto(bytes(dns_response), adresa_sursa)
+    simple_udp.sendto(bytes(dns_response), adresa_sursa,)
 
 """
 simple_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=socket.IPPROTO_UDP)
@@ -76,7 +76,22 @@ while True:
 
         # converitm payload-ul in pachet scapy
         packet = DNS(request)
+        if not packet or not packet.haslayer(DNS): 
+            dns_response = DNS(
+                              id = packet[DNS].id, # DNS replies must have the same ID as requests
+                              tc = 0, # fara trunchiere lol
+                              qr = 1,              # 1 for response, 0 for query 
+                              aa = 0,              # Authoritative Answer
+                              rcode = 0,           # 0, nicio eroare http://www.networksorcery.com/enp/protocol/dns.htm#Rcode,%20Return%20code
+                              qd = packet.qd,      # request-ul original
+                              an = answer_better)     # obiectul de reply
+            
+
         dns = packet.getlayer(DNS)
+
+        an = dns.an if dns.an else []
+        ns = dns.ns if dns.ns else []
+        ar = dns.ar if dns.ar else [] 
 
         if dns is not None and dns.opcode == 0: # dns QUERY
             print ("got: ")
@@ -101,7 +116,7 @@ while True:
                    rclass="IN",
                    rdata=r_data)     # found at IP: 1.1.1.1 :)
 
-                send_response(dns_answer, packet, adresa_sursa)
+                send_response(dns_answer, packet, adresa_sursa, simple_udp)
 
             elif (questionURL, dns.qd.qtype) in cache:
                 dns_answer = DNSRR(      # DNS Reply
@@ -111,28 +126,31 @@ while True:
                    rclass="IN",
                    rdata=cache[(questionURL, dns.qd.qtype)])
 
-                send_response(dns_answer, packet, adresa_sursa)
+                send_response(dns_answer, packet, adresa_sursa, simple_udp)
 
             else:
-                resp = recursiveResolver(dns.qd, dns.qd.qtype)
+                resp = recursiveResolver(dns, dns.qd.qtype)
 
-                send_response(dns_answer, packet, adresa_sursa) # o sa trimita oricum cod de eroare daca e eroare
+                send_response(resp, packet, adresa_sursa, simple_udp) # o sa trimita oricum cod de eroare daca e eroare
 
                 if resp.rcode == 0:
                     if resp.an != []:
                         print("lululu:",resp.an) # nu pare sa ne dea adresa ip, poate trebuie sa caut din nou?
                                                # acum merge :)
-                if resp.an.type == RecordType.A.value or resp.an.type == RecordType.AAAA.value:
-                    if len(cache) <= 1000: 
-                        print(resp.an)
-                        cached_response = resp.an[0] if isinstance(resp.an, list) else resp.an #iara era problema ca nu mergea
-                        cache[(questionURL, dns.qd.qtype)] = cached_response.rdata
-                    else:
-                        first_key = next(iter(cache))
-                        cache.pop(first_key) #cache-ul e un fifo, nu am zis ca e un chache eficient, dar functioneaza
-                        cache[(questionURL, dns.qd.qtype)] = resp.an.rdata
+                if resp.an != []:
+                    for answer in resp.an:
+                        if answer.type == RecordType.A.value or answer.type == RecordType.AAAA.value:
+                            if len(cache) <= 1000: 
+                                print(answer)
+                                cached_response = answer 
+                                cache[(questionURL, dns.qd.qtype)] = cached_response.rdata
+                            else:
+                                first_key = next(iter(cache))
+                                cache.pop(first_key) #cache-ul e un fifo, nu am zis ca e un chache eficient, dar functioneaza
+                                cache[(questionURL, dns.qd.qtype)] = answer.rdata
     except Exception as e: # ca sa nu se mai inchida script-ul la erori
-        print(e)
+            print('response:')
+            print(e)
 
 simple_udp.close()
 
