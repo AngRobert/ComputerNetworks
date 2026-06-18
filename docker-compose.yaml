@@ -120,6 +120,26 @@ services:
       networks:
         subnet1:
           ipv4_address: 172.10.0.40
+
+
+    dns_adblocker_udp:
+      build:
+        context: "AdBlockerDns/" 
+      ports:
+        - "53:53/udp"
+      networks:
+        subnet_Dns:
+          ipv4_address: 67.67.0.10 #adresa serviciului (containerului)
+
+    doh_endpoint:
+      build:
+        context: "AdBlockerDns/DohEndpoint/"
+      ports:
+        - "8000:5001" #portul fastapi la 5001
+      networks:
+        subnet_Dns:
+          ipv4_address: 67.67.0.11 
+          
     
 networks:
     subnet1:
@@ -138,3 +158,11 @@ networks:
           config:
               - subnet: 198.10.0.0/16
                 gateway: 198.10.1.1
+    
+    subnet_Dns:
+      ipam: #ip addres management, ne controleaza cum sunt folosite adresele ip ale retelei
+        driver: default #pt ca da
+        config:
+          - subnet: 67.67.0.0/16 # lmao 67
+            gateway: 67.67.1.1
+
