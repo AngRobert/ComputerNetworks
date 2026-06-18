@@ -1,0 +1,516 @@
+{
+  "total_blocked": 844,
+  "blocked_by_company": {
+    "Mktoresp": 2,
+    "Google": 194,
+    "Other": 362,
+    "Criteo": 49,
+    "Yahoo": 36,
+    "Twitter/X": 98,
+    "PubMatic": 31,
+    "AppNexus": 8,
+    "Microsoft": 64
+  },
+  "recent_blocked": [
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:05"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:05"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:04"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:04"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:04"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:04"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:03"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:02"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:02"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:02"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:02"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "ad-delivery.net",
+      "company": "Microsoft",
+      "timestamp": "2026-06-18 09:59:01"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dis.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dis.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dis.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dis.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dis.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:57"
+    },
+    {
+      "domain": "dsum.casalemedia.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "dsum.casalemedia.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "u.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "eb2.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "dsum.casalemedia.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "dsum.casalemedia.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "dsum.casalemedia.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:56"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "tlx.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "fastlane.rubiconproject.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "fastlane.rubiconproject.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "tlx.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "ups.analytics.yahoo.com",
+      "company": "Yahoo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "ups.analytics.yahoo.com",
+      "company": "Yahoo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "gum.criteo.com",
+      "company": "Criteo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "fastlane.rubiconproject.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "fastlane.rubiconproject.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "fastlane.rubiconproject.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "rtb.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "match.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "rtb.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "ups.analytics.yahoo.com",
+      "company": "Yahoo",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "tlx.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "tlx.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "direct.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "direct.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "tlx.3lift.com",
+      "company": "Twitter/X",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:55"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "rtb.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "rtb.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "sb.scorecardresearch.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "sb.scorecardresearch.com",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "direct.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "ups.analytics.yahoo.com",
+      "company": "Yahoo",
+      "timestamp": "2026-06-18 09:58:54"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "direct.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "hbopenbid.pubmatic.com",
+      "company": "PubMatic",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "rtb.openx.net",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "direct.adsrvr.org",
+      "company": "Other",
+      "timestamp": "2026-06-18 09:58:53"
+    },
+    {
+      "domain": "ups.analytics.yahoo.com",
+      "company": "Yahoo",
+      "timestamp": "2026-06-18 09:58:53"
+    }
+  ]
+}
