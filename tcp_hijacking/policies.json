@@ -6,8 +6,9 @@
         "*://*.80.96.21.96/*",
         "*://80.96.21.96/*",
         "*://haveibeenpwned.com/*",
-	"*://accuweather.com/*"
-      ]
+	"*://accuweather.com/*",
+	"*://*.accuweather.com/*",      
+	]
     },
     "DisableAppUpdate": true,
     "DisableTelemetry": true
