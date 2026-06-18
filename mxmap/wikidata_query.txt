@@ -1,0 +1,31 @@
+# Get Romanian UATs (communes, municipalities, Bucharest sectors) with their email and county.
+SELECT DISTINCT ?item ?itemLabel ?email ?judetLabel WHERE {
+
+  # gets the results in romanian language, then falls back to mul and english
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "ro,mul,en". }
+
+  # find all matching items first, then join with email/county
+  {
+    SELECT DISTINCT ?item WHERE {
+
+      # must be a Romanian entity: P17 = country, Q218 = Romania
+      ?item wdt:P17 wd:Q218.
+
+      {?item p:P31 ?statement0.
+      ?statement0 ps:P31 wd:Q640364.}   # instance of: municipality of Romania
+      UNION
+      {?item p:P31 ?statement1.
+      ?statement1 ps:P31 wd:Q15921300.} # instance of: sector of Bucharest
+      UNION
+      {?item p:P31 ?statement2.
+      ?statement2 (ps:P31/(wdt:P279*)) wd:Q697379.} # instance of any subclass of UAT of Romania
+    }
+  }
+  # email address 
+  { ?item wdt:P968 ?email. }
+
+  # gets the judet of the UAT
+  { ?item wdt:P131 ?judet. }
+
+}
+ORDER BY ?itemLabel
