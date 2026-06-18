@@ -48,7 +48,22 @@ def recursiveResolver(dnsqname, question_type):
     visitedIp = set()
     nextIp = root
 
-    name = dnsqname
+    if isinstance(dns_qd, (list, tuple)):
+        if len(dns_qd) > 0:
+            dns_qd = dns_qd[0]
+        else:
+            dns_qd = b""
+
+    if hasattr(dns_qd, "qname"):
+        name = dns_qd.qname
+    elif isinstance(dns_qd, bytes):
+        try:
+            name = DNSQR(dns_qd).qname
+        except Exception:
+            name = dns_qd
+    else:
+        name = dns_qd
+
     print(name, " numele de cautat")
 
     dns = DNS(aa=0, rcode=0, an=[], qd = [])

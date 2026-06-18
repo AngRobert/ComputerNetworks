@@ -97,12 +97,37 @@ while True:
             print ("got: ")
             print (packet.summary())
 
-            questionURL = dns.qd.qname.decode('utf-8') ##poate schimbi din dict in lista? oare e mai rapid search-ul?
-            #print(questionURL) ## aici e site-ul cautat
+            dns_qd = dns.qd
+            if isinstance(dns_qd, (list, tuple)) and len(dns_qd) > 0:
+                dns_qd_item = dns_qd[0]
+            elif isinstance(dns_qd, (list, tuple)):
+                dns_qd_item = None
+            else:
+                dns_qd_item = dns_qd
 
-            ##daca site-ul e in reclame, return 0.0.0.0, altfel, cauta in chache, altfel, recursive query
+            qd_qname = b""
+            qd_qtype = 1
+            if dns_qd_item is not None:
+                if hasattr(dns_qd_item, "qname"):
+                    qd_qname = dns_qd_item.qname
+                elif isinstance(dns_qd_item, bytes):
+                    try:
+                        qd_qname = DNSQR(dns_qd_item).qname
+                    except Exception:
+                        qd_qname = dns_qd_item
+
+                if hasattr(dns_qd_item, "qtype"):
+                    qd_qtype = dns_qd_item.qtype
+                elif isinstance(dns_qd_item, bytes):
+                    try:
+                        qd_qtype = DNSQR(dns_qd_item).qtype
+                    except Exception:
+                        pass
+
+            questionURL = qd_qname.decode('utf-8') if isinstance(qd_qname, bytes) else qd_qname
+
             if questionURL in adDict:
-                if dns.qd.qtype == RecordType.AAAA.value:
+                if qd_qtype == RecordType.AAAA.value:
                     r_type = 28
                     r_data = "0:0:0:0:0:0:0:0" #nu mergea cu "::"
                 else:
@@ -110,7 +135,7 @@ while True:
                     r_data = "0.0.0.0"
 
                 dns_answer = DNSRR(      # DNS Reply
-                   rrname=dns.qd.qname, # for question
+                   rrname=qd_qname, # for question
                    ttl=330,             # DNS entry Time to Live
                    type=r_type,            
                    rclass="IN",
@@ -118,18 +143,18 @@ while True:
 
                 send_response(dns_answer, packet, adresa_sursa, simple_udp)
 
-            elif (questionURL, dns.qd.qtype) in cache:
+            elif (questionURL, qd_qtype) in cache:
                 dns_answer = DNSRR(      # DNS Reply
-                   rrname=dns.qd.qname, # for question
+                   rrname=qd_qname, # for question
                    ttl=330,             # DNS entry Time to Live
-                   type=dns.qd.qtype,
+                   type=qd_qtype,
                    rclass="IN",
-                   rdata=cache[(questionURL, dns.qd.qtype)])
+                   rdata=cache[(questionURL, qd_qtype)])
 
                 send_response(dns_answer, packet, adresa_sursa, simple_udp)
 
             else:
-                resp = recursiveResolver(dns, dns.qd.qtype)
+                resp = recursiveResolver(dns.qd, qd_qtype)
 
                 send_response(resp, packet, adresa_sursa, simple_udp) # o sa trimita oricum cod de eroare daca e eroare
 
@@ -137,17 +162,15 @@ while True:
                     if resp.an != []:
                         print("lululu:",resp.an) # nu pare sa ne dea adresa ip, poate trebuie sa caut din nou?
                                                # acum merge :)
-                if resp.an != []:
-                    for answer in resp.an:
-                        if answer.type == RecordType.A.value or answer.type == RecordType.AAAA.value:
-                            if len(cache) <= 1000: 
-                                print(answer)
-                                cached_response = answer 
-                                cache[(questionURL, dns.qd.qtype)] = cached_response.rdata
-                            else:
-                                first_key = next(iter(cache))
-                                cache.pop(first_key) #cache-ul e un fifo, nu am zis ca e un chache eficient, dar functioneaza
-                                cache[(questionURL, dns.qd.qtype)] = answer.rdata
+                if resp.an.type == RecordType.A.value or resp.an.type == RecordType.AAAA.value:
+                    if len(cache) <= 1000: 
+                        print(resp.an)
+                        cached_response = resp.an[0] if isinstance(resp.an, list) else resp.an #iara era problema ca nu mergea
+                        cache[(questionURL, qd_qtype)] = cached_response.rdata
+                    else:
+                        first_key = next(iter(cache))
+                        cache.pop(first_key) #cache-ul e un fifo, nu am zis ca e un chache eficient, dar functioneaza
+                        cache[(questionURL, qd_qtype)] = resp.an.rdata
     except Exception as e: # ca sa nu se mai inchida script-ul la erori
             print('response:')
             print(e)
