@@ -81,7 +81,13 @@ def index():
 def get_stats():
     with block_stats_file:
         stats = load_stats()
-    return jsonify(stats)
+    response = jsonify(stats)
+
+    # necesar ca sa nu stocheze browser-ul in cache datele, ca degeaba le mai schimbam altfel
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.route('/block', methods=['POST'])
 def block_ad():

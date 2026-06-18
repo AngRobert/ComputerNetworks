@@ -534,7 +534,8 @@
         }
 
         function fetchData() {
-            fetch('/api/stats')
+            // parametrul _t e doar ca sa scapam de cache
+            fetch('/api/stats?_t=' + Date.now())
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('val-total').textContent = data.total_blocked.toLocaleString();
