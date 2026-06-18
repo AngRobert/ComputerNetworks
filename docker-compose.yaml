@@ -146,7 +146,7 @@ services:
       ports:
         - "5050:5050"
       volumes:
-        - ./ad_stats/data:/app/data
+        - ./ad_stats:/app
       networks:
         subnet1:
           ipv4_address: 172.10.0.50
