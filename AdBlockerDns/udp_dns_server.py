@@ -3,7 +3,8 @@ from recursive_resolver import *
 
 def send_response(dns_answer, packet, adresa_sursa, simple_udp):
 
-    if dns_answer.rcode != 0: #eroare
+    # Verificam daca raspunsul este un pachet DNS sau un record individual DNSRR
+    if hasattr(dns_answer, "rcode") and dns_answer.rcode != 0: #eroare
         response_rcode = dns_answer.rcode
         answer_better = []
         aa_real = 0
@@ -12,13 +13,19 @@ def send_response(dns_answer, packet, adresa_sursa, simple_udp):
         response_rcode = 0
         aa_real = 0
 
-        if dns_answer.an == []:
-            answer_better = []
-        else:
-            answer_better = dns_answer.an 
+        # Daca este un pachet DNS, extragem raspunsul
+        if hasattr(dns_answer, "an"):
+            if dns_answer.an == []:
+                answer_better = []
+            else:
+                answer_better = dns_answer.an 
 
-        if packet.qd.type == RecordType.CNAME.value:
-            answer_better = dns_answer.ns
+            # Modificat din type in qtype pentru a folosi atributul corect din Scapy
+            if packet.qd.qtype == RecordType.CNAME.value:
+                answer_better = dns_answer.ns
+        else:
+            # Altfel, este un singur record DNSRR
+            answer_better = dns_answer
 
 
     dns_response = DNS(

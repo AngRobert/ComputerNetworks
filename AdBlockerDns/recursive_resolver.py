@@ -28,8 +28,9 @@ def findIp(dns, visitedIp):
         if not hasattr(nameserver, "rdata"):
             continue
 
-        if namserver.rdata in visitedIp:
-            contiune
+        # Corectat numele variabilei din namserver in nameserver si instructiunea continue
+        if nameserver.rdata in visitedIp:
+            continue
         resp = recursiveResolver(nameserver.rdata, RecordType.A.value) #luam adresa serverului al carui nume il avem
 
         if resp.rcode != 0:
@@ -48,21 +49,22 @@ def recursiveResolver(dnsqname, question_type):
     visitedIp = set()
     nextIp = root
 
-    if isinstance(dns_qd, (list, tuple)):
-        if len(dns_qd) > 0:
-            dns_qd = dns_qd[0]
+    # Folosim dnsqname in loc de dns_qd deoarece acesta este numele parametrului
+    if isinstance(dnsqname, (list, tuple)):
+        if len(dnsqname) > 0:
+            dnsqname = dnsqname[0]
         else:
-            dns_qd = b""
+            dnsqname = b""
 
-    if hasattr(dns_qd, "qname"):
-        name = dns_qd.qname
-    elif isinstance(dns_qd, bytes):
+    if hasattr(dnsqname, "qname"):
+        name = dnsqname.qname
+    elif isinstance(dnsqname, bytes):
         try:
-            name = DNSQR(dns_qd).qname
+            name = DNSQR(dnsqname).qname
         except Exception:
-            name = dns_qd
+            name = dnsqname
     else:
-        name = dns_qd
+        name = dnsqname
 
     print(name, " numele de cautat")
 
