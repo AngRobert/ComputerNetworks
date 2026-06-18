@@ -1,0 +1,24 @@
+{
+  "total_blocked": 3,
+  "blocked_by_company": {
+    "Mktoresp": 2,
+    "Google": 1
+  },
+  "recent_blocked": [
+    {
+      "domain": "004-btr-463.mktoresp.com",
+      "company": "Mktoresp",
+      "timestamp": "2026-06-18 09:01:12"
+    },
+    {
+      "domain": "0.fls.doubleclick.net",
+      "company": "Google",
+      "timestamp": "2026-06-18 09:00:47"
+    },
+    {
+      "domain": "002-slq-470.mktoresp.com",
+      "company": "Mktoresp",
+      "timestamp": "2026-06-18 09:00:38"
+    }
+  ]
+}

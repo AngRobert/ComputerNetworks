@@ -1,5 +1,25 @@
 from scapy.all import *
 from recursive_resolver import *
+import urllib.request
+import json
+import threading
+
+def report_blocked_ad(domain):
+    try:
+        # Strip trailing dot if present
+        if domain.endswith('.'):
+            domain = domain[:-1]
+        data = json.dumps({"domain": domain}).encode('utf-8')
+        req = urllib.request.Request(
+            "http://67.67.0.12:5050/block",
+            data=data,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=1.0) as response:
+            response.read()
+    except Exception as e:
+        print(f"Failed to report blocked domain {domain}: {e}")
 
 def send_response(dns_answer, packet, adresa_sursa, simple_udp):
 
@@ -137,6 +157,9 @@ while True:
             questionURL = qd_qname.decode('utf-8') if isinstance(qd_qname, bytes) else qd_qname
 
             if questionURL in adDict:
+                # Report blocked domain asynchronously
+                threading.Thread(target=report_blocked_ad, args=(questionURL,), daemon=True).start()
+
                 if qd_qtype == RecordType.AAAA.value:
                     r_type = 28
                     r_data = "0:0:0:0:0:0:0:0" #nu mergea cu "::"
