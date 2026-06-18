@@ -16,7 +16,6 @@ def get_mac(ip_address):
 
 def restore_network(gateway_ip, gateway_mac, target_ip, target_mac):
     # Reverse ARP poisoning by sending correct ARP packets to both the gateway and the target.
-
     send(ARP(op=2, hwdst="ff:ff:ff:ff:ff:ff", pdst=gateway_ip, hwsrc=target_mac, psrc=target_ip), count=5, verbose=False)
     send(ARP(op=2, hwdst="ff:ff:ff:ff:ff:ff", pdst=target_ip, hwsrc=gateway_mac, psrc=gateway_ip), count=5, verbose=False)
 
