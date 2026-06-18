@@ -49,13 +49,17 @@ def recursiveResolver(dnsqname, question_type):
     visitedIp = set()
     nextIp = root
 
-    # Folosim dnsqname in loc de dns_qd deoarece acesta este numele parametrului
+    # Folosim dnsqname in loc de dns_qd deoarece acesta este numele parametrului.
+    # Verificam daca dnsqname este o lista sau un tuplu si luam primul element pentru a evita erorile de tip container.
     if isinstance(dnsqname, (list, tuple)):
         if len(dnsqname) > 0:
             dnsqname = dnsqname[0]
         else:
             dnsqname = b""
 
+    # Extragem numele interogarii (qname) in mod sigur. Daca obiectul are proprietatea 'qname', o folosim direct.
+    # Daca obiectul a fost parsat gresit ca fiind sir de octeti (bytes), incercam sa il decodificam ca un record DNSQR din Scapy.
+    # Acest pas previne 'bytes object has no attribute qname'.
     if hasattr(dnsqname, "qname"):
         name = dnsqname.qname
     elif isinstance(dnsqname, bytes):

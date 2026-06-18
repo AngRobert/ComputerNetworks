@@ -104,6 +104,7 @@ while True:
             print ("got: ")
             print (packet.summary())
 
+            # Extragem obiectul de query dns.qd in mod sigur, tratand cazurile in care Scapy il returneaza ca pe o lista/tuplu.
             dns_qd = dns.qd
             if isinstance(dns_qd, (list, tuple)) and len(dns_qd) > 0:
                 dns_qd_item = dns_qd[0]
@@ -115,6 +116,7 @@ while True:
             qd_qname = b""
             qd_qtype = 1
             if dns_qd_item is not None:
+                # Extragem in siguranta numele domeniului (qname) pentru a preveni exceptiile cand obiectul este de tip bytes.
                 if hasattr(dns_qd_item, "qname"):
                     qd_qname = dns_qd_item.qname
                 elif isinstance(dns_qd_item, bytes):
@@ -123,6 +125,7 @@ while True:
                     except Exception:
                         qd_qname = dns_qd_item
 
+                # Extragem tipul recordului (qtype) in mod sigur, cu fallback daca structura este neasteptata.
                 if hasattr(dns_qd_item, "qtype"):
                     qd_qtype = dns_qd_item.qtype
                 elif isinstance(dns_qd_item, bytes):
